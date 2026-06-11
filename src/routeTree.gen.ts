@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
   '/home': typeof HomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
   '/home': typeof HomeRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRoute
   '/discover': typeof DiscoverRoute
+  '/events': typeof EventsRoute
   '/home': typeof HomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats' | '/discover' | '/home'
+  fullPaths: '/' | '/chats' | '/discover' | '/events' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats' | '/discover' | '/home'
-  id: '__root__' | '/' | '/chats' | '/discover' | '/home'
+  to: '/' | '/chats' | '/discover' | '/events' | '/home'
+  id: '__root__' | '/' | '/chats' | '/discover' | '/events' | '/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChatsRoute: typeof ChatsRoute
   DiscoverRoute: typeof DiscoverRoute
+  EventsRoute: typeof EventsRoute
   HomeRoute: typeof HomeRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatsRoute: ChatsRoute,
   DiscoverRoute: DiscoverRoute,
+  EventsRoute: EventsRoute,
   HomeRoute: HomeRoute,
 }
 export const routeTree = rootRouteImport
