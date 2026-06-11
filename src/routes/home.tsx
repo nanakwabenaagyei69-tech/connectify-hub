@@ -38,7 +38,7 @@ function HomePage() {
         {topics.map((t) => (
           <button
             key={t.name}
-            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.hue} p-4 text-left transition-transform hover:-translate-y-0.5`}
+            className={`press press-glow relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.hue} p-4 text-left transition-transform hover:-translate-y-0.5`}
             style={{ boxShadow: "var(--shadow-card)" }}
           >
             <div className="text-2xl">{t.emoji}</div>
@@ -55,7 +55,7 @@ function HomePage() {
         {posts.map((p, i) => (
           <article
             key={i}
-            className="rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
+            className="press rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
           >
             <div className="flex items-center gap-3">
               <div
@@ -73,10 +73,10 @@ function HomePage() {
             </div>
             <p className="mt-3 text-[15px] leading-relaxed">{p.body}</p>
             <div className="mt-3 flex items-center gap-5 text-xs text-muted-foreground">
-              <button className="flex items-center gap-1.5 transition-colors hover:text-primary-glow">
+              <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow">
                 <Heart className="h-4 w-4" /> {p.likes}
               </button>
-              <button className="flex items-center gap-1.5 transition-colors hover:text-primary-glow">
+              <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow">
                 <MessageSquare className="h-4 w-4" /> {p.comments}
               </button>
             </div>

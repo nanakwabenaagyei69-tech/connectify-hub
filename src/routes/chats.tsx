@@ -54,7 +54,7 @@ function Chats() {
           />
           <button
             type="submit"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-primary-foreground"
+            className="press press-glow flex h-9 w-9 items-center justify-center rounded-full text-primary-foreground"
             style={{ background: "var(--gradient-primary)" }}
           >
             <Send className="h-4 w-4" />

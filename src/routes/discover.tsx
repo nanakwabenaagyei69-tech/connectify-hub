@@ -43,7 +43,7 @@ function Discover() {
             <Link
               to="/chats"
               key={p.handle}
-              className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-primary/40"
+              className="press flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-primary/40"
             >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-primary-foreground"
@@ -55,7 +55,7 @@ function Discover() {
                 <div className="text-sm font-semibold">{p.name}</div>
                 <div className="text-xs text-muted-foreground">@{p.handle} · {p.country}</div>
               </div>
-              <button className="rounded-full border border-primary/40 px-3 py-1 text-xs font-semibold text-primary-glow">
+              <button className="press press-sm rounded-full border border-primary/40 px-3 py-1 text-xs font-semibold text-primary-glow">
                 Chat
               </button>
             </Link>
@@ -69,7 +69,7 @@ function Discover() {
           .map((g) => (
             <div
               key={g.name}
-              className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3"
+              className="press flex items-center gap-3 rounded-2xl border border-border bg-card p-3"
             >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-2xl text-primary-foreground"
@@ -81,7 +81,7 @@ function Discover() {
                 <div className="text-sm font-semibold">{g.name}</div>
                 <div className="text-xs text-muted-foreground">{g.members.toLocaleString()} members</div>
               </div>
-              <button className="rounded-full border border-primary/40 px-3 py-1 text-xs font-semibold text-primary-glow">
+              <button className="press press-sm rounded-full border border-primary/40 px-3 py-1 text-xs font-semibold text-primary-glow">
                 Join
               </button>
             </div>
