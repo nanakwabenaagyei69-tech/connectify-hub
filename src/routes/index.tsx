@@ -1,29 +1,100 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, MessageCircle, Users, Globe2, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Links — United we stand" },
+      { name: "description", content: "Connect with people and groups near you. Share ideas. Show up for global events." },
     ],
   }),
-  component: Index,
+  component: Landing,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Landing() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+      {/* Glow orbs */}
+      <div className="pointer-events-none absolute -left-32 top-20 h-96 w-96 rounded-full bg-primary/30 blur-[120px]" />
+      <div className="pointer-events-none absolute right-0 top-1/2 h-80 w-80 rounded-full bg-accent/30 blur-[120px]" />
+
+      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <div className="text-2xl font-black tracking-tight">
+          <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">Links</span>
+        </div>
+        <nav className="flex items-center gap-3">
+          <Link to="/auth" className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:text-foreground">
+            Sign in
+          </Link>
+          <Link
+            to="/auth"
+            className="rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            Join Links
+          </Link>
+        </nav>
+      </header>
+
+      <section className="relative z-10 mx-auto max-w-4xl px-6 pt-16 pb-24 text-center">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
+          <Sparkles className="h-3 w-3 text-primary-glow" />
+          For everyone 14 and up
+        </div>
+        <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
+          United we
+          <br />
+          <span className="bg-gradient-to-r from-primary-glow via-accent to-primary bg-clip-text text-transparent">
+            stand.
+          </span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
+          Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/home"
+            className="group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            Enter the app
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
+            to="/discover"
+            className="rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card"
+          >
+            Explore topics
+          </Link>
+        </div>
+      </section>
+
+      <section className="relative z-10 mx-auto grid max-w-5xl gap-4 px-6 pb-24 md:grid-cols-3">
+        {[
+          { icon: MessageCircle, title: "Real conversations", body: "Threaded chats and comment sections that don't feel like noise." },
+          { icon: Users, title: "Groups that matter", body: "Spin up a group for a class project, a hobby, or a cause in seconds." },
+          { icon: Globe2, title: "Global events", body: "RSVP to celebrations and meetups around the world — see them on a map." },
+        ].map(({ icon: Icon, title, body }) => (
+          <div
+            key={title}
+            className="rounded-3xl border border-border p-6 backdrop-blur transition-transform hover:-translate-y-1"
+            style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
+          >
+            <div
+              className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <Icon className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-bold">{title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+          </div>
+        ))}
+      </section>
+
+      <footer className="relative z-10 border-t border-border py-8 text-center text-xs text-muted-foreground">
+        Links · United we stand · Built with care for ages 14+
+      </footer>
     </div>
   );
 }
