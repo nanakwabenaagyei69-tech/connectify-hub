@@ -28,7 +28,7 @@ function Landing() {
           </Link>
           <Link
             to="/auth"
-            className="rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            className="press press-glow rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
             style={{ background: "var(--gradient-primary)" }}
           >
             Join Links
@@ -54,7 +54,7 @@ function Landing() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/home"
-            className="group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
             style={{ background: "var(--gradient-primary)" }}
           >
             Enter the app
@@ -62,7 +62,7 @@ function Landing() {
           </Link>
           <Link
             to="/discover"
-            className="rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card"
+            className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card"
           >
             Explore topics
           </Link>

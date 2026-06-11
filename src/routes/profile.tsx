@@ -33,7 +33,7 @@ function Profile() {
         ].map(({ icon: Icon, label, value }) => (
           <button
             key={label}
-            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
+            className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
           >
             <Icon className="h-4 w-4 text-primary-glow" />
             <span className="flex-1 text-sm font-semibold">{label}</span>
@@ -42,7 +42,7 @@ function Profile() {
         ))}
         <Link
           to="/"
-          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left text-destructive transition-colors hover:border-destructive/40"
+          className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left text-destructive transition-colors hover:border-destructive/40"
         >
           <LogOut className="h-4 w-4" />
           <span className="flex-1 text-sm font-semibold">Sign out</span>

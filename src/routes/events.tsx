@@ -37,7 +37,7 @@ function Events() {
 
       <div className="space-y-3">
         {events.map((e) => (
-          <div key={e.name} className="rounded-2xl border border-border bg-card p-4">
+          <div key={e.name} className="press rounded-2xl border border-border bg-card p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-bold">{e.name}</h3>
@@ -48,7 +48,7 @@ function Events() {
                 <div className="mt-2 text-xs text-primary-glow">{e.going.toLocaleString()} going</div>
               </div>
               <button
-                className="rounded-full px-4 py-2 text-xs font-semibold text-primary-foreground"
+                className="press press-glow rounded-full px-4 py-2 text-xs font-semibold text-primary-foreground"
                 style={{ background: "var(--gradient-primary)" }}
               >
                 Sign up
