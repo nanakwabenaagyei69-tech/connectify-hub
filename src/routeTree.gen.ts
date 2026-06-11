@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,21 @@ export interface FileRoutesById {
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats' | '/discover' | '/events' | '/home'
+  fullPaths: '/' | '/chats' | '/discover' | '/events' | '/home' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats' | '/discover' | '/events' | '/home'
-  id: '__root__' | '/' | '/chats' | '/discover' | '/events' | '/home'
+  to: '/' | '/chats' | '/discover' | '/events' | '/home' | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/chats'
+    | '/discover'
+    | '/events'
+    | '/home'
+    | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,10 +93,18 @@ export interface RootRouteChildren {
   DiscoverRoute: typeof DiscoverRoute
   EventsRoute: typeof EventsRoute
   HomeRoute: typeof HomeRoute
+  ProfileRoute: typeof ProfileRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/home': {
       id: '/home'
       path: '/home'
@@ -125,6 +149,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverRoute: DiscoverRoute,
   EventsRoute: EventsRoute,
   HomeRoute: HomeRoute,
+  ProfileRoute: ProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
