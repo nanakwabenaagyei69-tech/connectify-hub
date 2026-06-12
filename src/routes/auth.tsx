@@ -25,10 +25,12 @@ function Auth() {
           className="rounded-3xl border border-border p-6 backdrop-blur"
           style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
         >
-          <div className="mb-6 flex rounded-full border border-border bg-background/40 p-1 text-sm">
+          <div className="mb-6 flex rounded-full border border-border bg-background/40 p-1 text-sm" role="tablist" aria-label="Authentication mode">
             {(["signup", "signin"] as const).map((m) => (
               <button
                 key={m}
+                role="tab"
+                aria-selected={mode === m}
                 onClick={() => { setMode(m); setStep(1); }}
                 className={`flex-1 rounded-full py-2 font-semibold transition-colors ${
                   mode === m ? "text-primary-foreground" : "text-muted-foreground"
