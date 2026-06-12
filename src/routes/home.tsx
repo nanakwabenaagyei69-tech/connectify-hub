@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
 import { Search, Heart, MessageSquare, TrendingUp } from "lucide-react";
+import { useKeyboardAction } from "@/hooks/use-keyboard-action";
 
 export const Route = createFileRoute("/home")({
   head: () => ({ meta: [{ title: "Home — Links" }] }),

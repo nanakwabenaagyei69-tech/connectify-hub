@@ -54,10 +54,11 @@ function Chats() {
           />
           <button
             type="submit"
+            aria-label="Send message"
             className="press press-glow flex h-9 w-9 items-center justify-center rounded-full text-primary-foreground"
             style={{ background: "var(--gradient-primary)" }}
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </form>

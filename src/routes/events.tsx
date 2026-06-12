@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
 import { MapPin, Calendar } from "lucide-react";
+import { useKeyboardAction } from "@/hooks/use-keyboard-action";
 
 export const Route = createFileRoute("/events")({
   head: () => ({ meta: [{ title: "Events — Links" }] }),

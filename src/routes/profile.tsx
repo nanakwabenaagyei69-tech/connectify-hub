@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
 import { Settings, Globe, Languages, LogOut } from "lucide-react";
+import { useKeyboardAction } from "@/hooks/use-keyboard-action";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "You — Links" }] }),

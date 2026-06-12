@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
 import { Search, Users } from "lucide-react";
 import { useState } from "react";
+import { useKeyboardAction } from "@/hooks/use-keyboard-action";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({ meta: [{ title: "Discover — Links" }] }),
