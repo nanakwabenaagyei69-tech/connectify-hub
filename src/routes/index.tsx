@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MessageCircle, Users, Globe2, Sparkles } from "lucide-react";
+import { useKeyboardAction } from "@/hooks/use-keyboard-action";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -10,6 +11,46 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+const features = [
+  { icon: MessageCircle, title: "Real conversations", body: "Threaded chats and comment sections that don't feel like noise." },
+  { icon: Users, title: "Groups that matter", body: "Spin up a group for a class project, a hobby, or a cause in seconds." },
+  { icon: Globe2, title: "Global events", body: "RSVP to celebrations and meetups around the world — see them on a map." },
+];
+
+function FeatureCard({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: React.ElementType;
+  title: string;
+  body: string;
+}) {
+  const handleCard = () => {};
+  const onCardKeyDown = useKeyboardAction(handleCard);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleCard}
+      onKeyDown={onCardKeyDown}
+      className="rounded-3xl border border-border p-6 backdrop-blur transition-transform hover:-translate-y-1 cursor-pointer"
+      style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
+      aria-label={`Feature: ${title}`}
+    >
+      <div
+        className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-primary-foreground"
+        style={{ background: "var(--gradient-primary)" }}
+        aria-hidden="true"
+      >
+        <Icon className="h-5 w-5" />
+      </div>
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+    </div>
+  );
+}
 
 function Landing() {
   return (
@@ -23,12 +64,12 @@ function Landing() {
           <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">Links</span>
         </div>
         <nav className="flex items-center gap-3">
-          <Link to="/auth" className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:text-foreground">
+          <Link to="/auth" className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:text-foreground focus-visible:rounded-full">
             Sign in
           </Link>
           <Link
             to="/auth"
-            className="press press-glow rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            className="press press-glow rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
             style={{ background: "var(--gradient-primary)" }}
           >
             Join Links
@@ -38,7 +79,7 @@ function Landing() {
 
       <section className="relative z-10 mx-auto max-w-4xl px-6 pt-16 pb-24 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
-          <Sparkles className="h-3 w-3 text-primary-glow" />
+          <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
           For everyone 14 and up
         </div>
         <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
@@ -54,15 +95,15 @@ function Landing() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/home"
-            className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105"
+            className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
             style={{ background: "var(--gradient-primary)" }}
           >
             Enter the app
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
           <Link
             to="/discover"
-            className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card"
+            className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card focus-visible:rounded-full"
           >
             Explore topics
           </Link>
@@ -70,25 +111,8 @@ function Landing() {
       </section>
 
       <section className="relative z-10 mx-auto grid max-w-5xl gap-4 px-6 pb-24 md:grid-cols-3">
-        {[
-          { icon: MessageCircle, title: "Real conversations", body: "Threaded chats and comment sections that don't feel like noise." },
-          { icon: Users, title: "Groups that matter", body: "Spin up a group for a class project, a hobby, or a cause in seconds." },
-          { icon: Globe2, title: "Global events", body: "RSVP to celebrations and meetups around the world — see them on a map." },
-        ].map(({ icon: Icon, title, body }) => (
-          <div
-            key={title}
-            className="rounded-3xl border border-border p-6 backdrop-blur transition-transform hover:-translate-y-1"
-            style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
-          >
-            <div
-              className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-primary-foreground"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              <Icon className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold">{title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-          </div>
+        {features.map(({ icon, title, body }) => (
+          <FeatureCard key={title} icon={icon} title={title} body={body} />
         ))}
       </section>
 
