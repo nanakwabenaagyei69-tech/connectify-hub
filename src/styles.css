@@ -159,6 +159,20 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
+  /* Global focus-visible ring: high-contrast purple glow on dark bg */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary-glow);
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .press,
+    .route-enter {
+      transition: none;
+      animation: none;
+    }
+  }
 }
 
 @layer utilities {
