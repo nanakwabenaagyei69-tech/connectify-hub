@@ -18,6 +18,7 @@ function Profile() {
         <div
           className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-2xl font-black text-primary-foreground"
           style={{ background: "var(--gradient-primary)" }}
+          aria-hidden="true"
         >
           A
         </div>
@@ -31,21 +32,27 @@ function Profile() {
           { icon: Globe, label: "Country", value: "Mexico" },
           { icon: Languages, label: "Language", value: "English" },
           { icon: Settings, label: "Settings", value: "" },
-        ].map(({ icon: Icon, label, value }) => (
-          <button
-            key={label}
-            className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
-          >
-            <Icon className="h-4 w-4 text-primary-glow" />
-            <span className="flex-1 text-sm font-semibold">{label}</span>
-            <span className="text-xs text-muted-foreground">{value}</span>
-          </button>
-        ))}
+        ].map(({ icon: Icon, label, value }) => {
+          const handleClick = () => {};
+          const onKeyDown = useKeyboardAction(handleClick);
+          return (
+            <button
+              key={label}
+              onClick={handleClick}
+              onKeyDown={onKeyDown}
+              className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
+            >
+              <Icon className="h-4 w-4 text-primary-glow" aria-hidden="true" />
+              <span className="flex-1 text-sm font-semibold">{label}</span>
+              <span className="text-xs text-muted-foreground">{value}</span>
+            </button>
+          );
+        })}
         <Link
           to="/"
-          className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left text-destructive transition-colors hover:border-destructive/40"
+          className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left text-destructive transition-colors hover:border-destructive/40 focus-visible:rounded-2xl"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4" aria-hidden="true" />
           <span className="flex-1 text-sm font-semibold">Sign out</span>
         </Link>
       </div>

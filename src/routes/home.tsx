@@ -23,12 +23,70 @@ const posts = [
   { user: "ines.b", topic: "Climate", time: "1h", body: "Local cleanup this weekend in Lisbon. Bring friends — every hand counts.", likes: 56, comments: 12 },
 ];
 
+function TopicCard({ t }: { t: typeof topics[number] }) {
+  const handleTopic = () => {};
+  const onTopicKeyDown = useKeyboardAction(handleTopic);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleTopic}
+      onKeyDown={onTopicKeyDown}
+      className={`press press-glow relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.hue} p-4 text-left transition-transform hover:-translate-y-0.5 cursor-pointer`}
+      style={{ boxShadow: "var(--shadow-card)" }}
+      aria-label={`Select topic ${t.name}`}
+    >
+      <div className="text-2xl" aria-hidden="true">{t.emoji}</div>
+      <div className="mt-2 text-sm font-bold text-white">{t.name}</div>
+    </div>
+  );
+}
+
+function PostCard({ p }: { p: typeof posts[number] }) {
+  const handlePost = () => {};
+  const onPostKeyDown = useKeyboardAction(handlePost);
+  return (
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={handlePost}
+      onKeyDown={onPostKeyDown}
+      className="press rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40 cursor-pointer"
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-primary-foreground"
+          style={{ background: "var(--gradient-primary)" }}
+          aria-hidden="true"
+        >
+          {p.user[0].toUpperCase()}
+        </div>
+        <div className="flex-1">
+          <div className="text-sm font-semibold">@{p.user}</div>
+          <div className="text-xs text-muted-foreground">
+            in <span className="text-primary-glow">{p.topic}</span> · {p.time}
+          </div>
+        </div>
+      </div>
+      <p className="mt-3 text-[15px] leading-relaxed">{p.body}</p>
+      <div className="mt-3 flex items-center gap-5 text-xs text-muted-foreground">
+        <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow" aria-label={`Like, ${p.likes} likes`}>
+          <Heart className="h-4 w-4" aria-hidden="true" /> {p.likes}
+        </button>
+        <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow" aria-label={`Comment, ${p.comments} comments`}>
+          <MessageSquare className="h-4 w-4" aria-hidden="true" /> {p.comments}
+        </button>
+      </div>
+    </article>
+  );
+}
+
 function HomePage() {
   return (
     <AppShell title="Home">
       <Link
         to="/discover"
-        className="mb-5 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-muted-foreground"
+        className="mb-5 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-muted-foreground focus-visible:rounded-2xl"
       >
         <Search className="h-4 w-4" />
         <span className="text-sm">Search people, groups, topics…</span>
@@ -36,71 +94,19 @@ function HomePage() {
 
       <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">Choose a topic</h2>
       <div className="mb-8 grid grid-cols-3 gap-3">
-        {topics.map((t) => {
-          const handleTopic = () => {};
-          const onTopicKeyDown = useKeyboardAction(handleTopic);
-          return (
-            <div
-              key={t.name}
-              role="button"
-              tabIndex={0}
-              onClick={handleTopic}
-              onKeyDown={onTopicKeyDown}
-              className={`press press-glow relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.hue} p-4 text-left transition-transform hover:-translate-y-0.5 cursor-pointer`}
-              style={{ boxShadow: "var(--shadow-card)" }}
-              aria-label={`Select topic ${t.name}`}
-            >
-              <div className="text-2xl" aria-hidden="true">{t.emoji}</div>
-              <div className="mt-2 text-sm font-bold text-white">{t.name}</div>
-            </div>
-          );
-        })}
+        {topics.map((t) => (
+          <TopicCard key={t.name} t={t} />
+        ))}
       </div>
 
       <div className="mb-3 flex items-center gap-2">
-        <TrendingUp className="h-4 w-4 text-primary-glow" />
+        <TrendingUp className="h-4 w-4 text-primary-glow" aria-hidden="true" />
         <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Trending</h2>
       </div>
       <div className="space-y-3">
-        {posts.map((p, i) => {
-          const handlePost = () => {};
-          const onPostKeyDown = useKeyboardAction(handlePost);
-          return (
-            <article
-              key={i}
-              role="button"
-              tabIndex={0}
-              onClick={handlePost}
-              onKeyDown={onPostKeyDown}
-              className="press rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40 cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-primary-foreground"
-                  style={{ background: "var(--gradient-primary)" }}
-                  aria-hidden="true"
-                >
-                  {p.user[0].toUpperCase()}
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-semibold">@{p.user}</div>
-                  <div className="text-xs text-muted-foreground">
-                    in <span className="text-primary-glow">{p.topic}</span> · {p.time}
-                  </div>
-                </div>
-              </div>
-              <p className="mt-3 text-[15px] leading-relaxed">{p.body}</p>
-              <div className="mt-3 flex items-center gap-5 text-xs text-muted-foreground">
-                <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow" aria-label={`Like, ${p.likes} likes`}>
-                  <Heart className="h-4 w-4" aria-hidden="true" /> {p.likes}
-                </button>
-                <button className="press press-sm flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:text-primary-glow" aria-label={`Comment, ${p.comments} comments`}>
-                  <MessageSquare className="h-4 w-4" aria-hidden="true" /> {p.comments}
-                </button>
-              </div>
-            </article>
-          );
-        })}
+        {posts.map((p, i) => (
+          <PostCard key={i} p={p} />
+        ))}
       </div>
     </AppShell>
   );

@@ -15,6 +15,39 @@ const events = [
   { name: "Diwali Lights Meetup", city: "Mumbai, India", date: "Oct 29", going: 12030 },
 ];
 
+function EventCard({ e }: { e: typeof events[number] }) {
+  const handleCard = () => {};
+  const onCardKeyDown = useKeyboardAction(handleCard);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleCard}
+      onKeyDown={onCardKeyDown}
+      className="press rounded-2xl border border-border bg-card p-4 cursor-pointer transition-colors hover:border-primary/40"
+      aria-label={`Event ${e.name} in ${e.city} on ${e.date}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-base font-bold">{e.name}</h3>
+          <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" aria-hidden="true" /> {e.city}</span>
+            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" aria-hidden="true" /> {e.date}</span>
+          </div>
+          <div className="mt-2 text-xs text-primary-glow">{e.going.toLocaleString()} going</div>
+        </div>
+        <button
+          className="press press-glow rounded-full px-4 py-2 text-xs font-semibold text-primary-foreground"
+          style={{ background: "var(--gradient-primary)" }}
+          aria-label={`Sign up for ${e.name}`}
+        >
+          Sign up
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Events() {
   return (
     <AppShell title="Global Events">
@@ -38,24 +71,7 @@ function Events() {
 
       <div className="space-y-3">
         {events.map((e) => (
-          <div key={e.name} className="press rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="text-base font-bold">{e.name}</h3>
-                <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {e.city}</span>
-                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {e.date}</span>
-                </div>
-                <div className="mt-2 text-xs text-primary-glow">{e.going.toLocaleString()} going</div>
-              </div>
-              <button
-                className="press press-glow rounded-full px-4 py-2 text-xs font-semibold text-primary-foreground"
-                style={{ background: "var(--gradient-primary)" }}
-              >
-                Sign up
-              </button>
-            </div>
-          </div>
+          <EventCard key={e.name} e={e} />
         ))}
       </div>
     </AppShell>
