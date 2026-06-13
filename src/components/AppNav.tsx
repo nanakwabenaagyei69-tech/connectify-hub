@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Home, Compass, MessageCircle, Calendar, User } from "lucide-react";
 import { useSwipeNavigation, hapticTap } from "@/hooks/use-swipe-nav";
 import { useCallback, useEffect, useRef } from "react";
+import { LinksOS } from "@/components/LinksOS";
 
 const items = [
   { to: "/home", label: "Home", icon: Home },
@@ -91,6 +92,7 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
         {children}
       </main>
       <AppNav />
+      <LinksOS />
     </div>
   );
 }
