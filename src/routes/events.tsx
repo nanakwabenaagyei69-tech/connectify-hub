@@ -1,25 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
 import { MapPin, Calendar, Plus, Check, Loader2, X } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+const EventsMap = lazy(() => import("@/components/EventsMap"));
 
 export const Route = createFileRoute("/events")({
   head: () => ({ meta: [{ title: "Events — Links" }] }),
   component: Events,
-});
-
-// Fix leaflet's default marker icon (which relies on imported asset URLs)
-const purpleIcon = L.divIcon({
-  className: "links-marker",
-  html: `<div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d946ef);box-shadow:0 0 0 4px rgba(168,85,247,.25),0 4px 14px rgba(168,85,247,.5);border:2px solid white;"></div>`,
-  iconSize: [22, 22],
-  iconAnchor: [11, 11],
 });
 
 type Event = {
@@ -90,30 +81,19 @@ function Events() {
   }
 
   const mappable = events.filter((e) => e.latitude != null && e.longitude != null);
-  const center: [number, number] = mappable[0]
-    ? [mappable[0].latitude!, mappable[0].longitude!]
-    : [20, 0];
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <AppShell title="Global Events">
       <div className="relative mb-4 h-56 overflow-hidden rounded-3xl border border-border">
-        <MapContainer center={center} zoom={mappable.length ? 3 : 2} style={{ height: "100%", width: "100%" }} scrollWheelZoom={false}>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          />
-          {mappable.map((e) => (
-            <Marker key={e.id} position={[e.latitude!, e.longitude!]} icon={purpleIcon}>
-              <Popup>
-                <div className="text-xs">
-                  <div className="font-bold">{e.title}</div>
-                  <div>{e.location_name}</div>
-                  <div>{new Date(e.starts_at).toLocaleString()}</div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        {mounted ? (
+          <Suspense fallback={<div className="flex h-full items-center justify-center text-xs text-muted-foreground">Loading map…</div>}>
+            <EventsMap events={mappable.map((e) => ({ id: e.id, title: e.title, location_name: e.location_name, latitude: e.latitude!, longitude: e.longitude!, starts_at: e.starts_at }))} />
+          </Suspense>
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Loading map…</div>
+        )}
       </div>
 
       <div className="mb-4 flex items-center justify-between">
