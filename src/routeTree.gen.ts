@@ -16,6 +16,7 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChatsRoomIdRouteImport } from './routes/chats.$roomId'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
@@ -52,34 +53,42 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatsRoomIdRoute = ChatsRoomIdRouteImport.update({
+  id: '/$roomId',
+  path: '/$roomId',
+  getParentRoute: () => ChatsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chats': typeof ChatsRoute
+  '/chats': typeof ChatsRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
+  '/chats/$roomId': typeof ChatsRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chats': typeof ChatsRoute
+  '/chats': typeof ChatsRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
+  '/chats/$roomId': typeof ChatsRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/chats': typeof ChatsRoute
+  '/chats': typeof ChatsRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/events': typeof EventsRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
+  '/chats/$roomId': typeof ChatsRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,8 +100,17 @@ export interface FileRouteTypes {
     | '/events'
     | '/home'
     | '/profile'
+    | '/chats/$roomId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/chats' | '/discover' | '/events' | '/home' | '/profile'
+  to:
+    | '/'
+    | '/auth'
+    | '/chats'
+    | '/discover'
+    | '/events'
+    | '/home'
+    | '/profile'
+    | '/chats/$roomId'
   id:
     | '__root__'
     | '/'
@@ -102,12 +120,13 @@ export interface FileRouteTypes {
     | '/events'
     | '/home'
     | '/profile'
+    | '/chats/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  ChatsRoute: typeof ChatsRoute
+  ChatsRoute: typeof ChatsRouteWithChildren
   DiscoverRoute: typeof DiscoverRoute
   EventsRoute: typeof EventsRoute
   HomeRoute: typeof HomeRoute
@@ -165,13 +184,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chats/$roomId': {
+      id: '/chats/$roomId'
+      path: '/$roomId'
+      fullPath: '/chats/$roomId'
+      preLoaderRoute: typeof ChatsRoomIdRouteImport
+      parentRoute: typeof ChatsRoute
+    }
   }
 }
+
+interface ChatsRouteChildren {
+  ChatsRoomIdRoute: typeof ChatsRoomIdRoute
+}
+
+const ChatsRouteChildren: ChatsRouteChildren = {
+  ChatsRoomIdRoute: ChatsRoomIdRoute,
+}
+
+const ChatsRouteWithChildren = ChatsRoute._addFileChildren(ChatsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  ChatsRoute: ChatsRoute,
+  ChatsRoute: ChatsRouteWithChildren,
   DiscoverRoute: DiscoverRoute,
   EventsRoute: EventsRoute,
   HomeRoute: HomeRoute,
@@ -180,13 +216,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

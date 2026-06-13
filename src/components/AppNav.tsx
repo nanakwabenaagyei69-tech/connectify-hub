@@ -3,6 +3,7 @@ import { Home, Compass, MessageCircle, Calendar, User } from "lucide-react";
 import { useSwipeNavigation, hapticTap } from "@/hooks/use-swipe-nav";
 import { useCallback, useEffect, useRef } from "react";
 import { LinksOS } from "@/components/LinksOS";
+import { useAuth } from "@/hooks/use-auth";
 
 const items = [
   { to: "/home", label: "Home", icon: Home },
@@ -76,6 +77,18 @@ export function AppNav() {
 
 export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
   useSwipeNavigation();
+  const { session, loading } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!loading && !session) navigate({ to: "/auth", replace: true });
+  }, [loading, session, navigate]);
+  if (loading || !session) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-background pb-20">
       {title && (

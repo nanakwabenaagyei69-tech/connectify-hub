@@ -1,67 +1,106 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
-import { Send } from "lucide-react";
-import { useState } from "react";
+import { MessageCircle, Users, Loader2 } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/chats")({
   head: () => ({ meta: [{ title: "Chats — Links" }] }),
-  component: Chats,
+  component: ChatsList,
 });
 
-const seed = [
-  { from: "them", text: "Hey! Saw your post about the science project — count me in." },
-  { from: "me", text: "Amazing 💜 Want to brainstorm tonight at 8?" },
-  { from: "them", text: "Perfect. I'll bring some articles on solar." },
-];
+type Room = {
+  id: string;
+  name: string;
+  is_group: boolean;
+  topic: string | null;
+  last_message: string | null;
+  last_at: string | null;
+};
 
-function Chats() {
-  const [msgs, setMsgs] = useState(seed);
-  const [text, setText] = useState("");
+function ChatsList() {
+  const { user } = useAuth();
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data: mem } = await supabase.from("room_members").select("room_id").eq("user_id", user.id);
+    const ids = (mem ?? []).map((m: any) => m.room_id);
+    if (ids.length === 0) {
+      setRooms([]);
+      setLoading(false);
+      return;
+    }
+    const { data: rs } = await supabase.from("chat_rooms").select("id, name, is_group, topic").in("id", ids);
+    const { data: msgs } = await supabase
+      .from("messages")
+      .select("room_id, body, created_at")
+      .in("room_id", ids)
+      .order("created_at", { ascending: false });
+    const lastByRoom = new Map<string, { body: string; created_at: string }>();
+    (msgs ?? []).forEach((m: any) => {
+      if (!lastByRoom.has(m.room_id)) lastByRoom.set(m.room_id, { body: m.body, created_at: m.created_at });
+    });
+    const enriched: Room[] = (rs ?? []).map((r) => {
+      const l = lastByRoom.get(r.id);
+      return {
+        id: r.id,
+        name: r.name,
+        is_group: r.is_group,
+        topic: r.topic,
+        last_message: l?.body ?? null,
+        last_at: l?.created_at ?? null,
+      };
+    });
+    enriched.sort((a, b) => (b.last_at ?? "").localeCompare(a.last_at ?? ""));
+    setRooms(enriched);
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const ch = supabase
+      .channel("rooms-list")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [load]);
+
   return (
-    <AppShell title="Renewable Energy Club">
-      <div className="space-y-3 pb-24">
-        {msgs.map((m, i) => (
-          <div key={i} className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.from === "me"
-                  ? "text-primary-foreground"
-                  : "border border-border bg-card text-foreground"
-              }`}
-              style={m.from === "me" ? { background: "var(--gradient-primary)" } : undefined}
-            >
-              {m.text}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!text.trim()) return;
-          setMsgs([...msgs, { from: "me", text: text.trim() }]);
-          setText("");
-        }}
-        className="fixed bottom-20 left-0 right-0 z-40 px-4"
-      >
-        <div className="mx-auto flex max-w-2xl items-center gap-2 rounded-full border border-border bg-card/90 p-1.5 backdrop-blur-xl">
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Message…"
-            className="flex-1 bg-transparent px-4 py-2 text-sm outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            aria-label="Send message"
-            className="press press-glow flex h-9 w-9 items-center justify-center rounded-full text-primary-foreground"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            <Send className="h-4 w-4" aria-hidden="true" />
-          </button>
+    <AppShell title="Chats">
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+      ) : rooms.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          No chats yet. Head to <Link to="/discover" className="text-primary-glow underline">Discover</Link> to join a group or message someone.
         </div>
-      </form>
+      ) : (
+        <div className="space-y-2">
+          {rooms.map((r) => (
+            <Link
+              key={r.id}
+              to="/chats/$roomId"
+              params={{ roomId: r.id }}
+              className="press flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-primary/40"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+                {r.is_group ? <Users className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between gap-2">
+                  <div className="truncate text-sm font-semibold">{r.name}</div>
+                  {r.last_at && <span className="text-[10px] text-muted-foreground">{new Date(r.last_at).toLocaleDateString()}</span>}
+                </div>
+                <div className="truncate text-xs text-muted-foreground">{r.last_message ?? (r.topic ?? "No messages yet")}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </AppShell>
   );
 }
