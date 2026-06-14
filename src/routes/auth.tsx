@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,6 +11,25 @@ export const Route = createFileRoute("/auth")({
   component: Auth,
 });
 
+const TOPIC_OPTIONS = [
+  "Music",
+  "Gaming",
+  "Art",
+  "Sports",
+  "Movies",
+  "Books",
+  "Tech",
+  "Fashion",
+  "Food",
+  "Travel",
+  "Photography",
+  "Fitness",
+  "Anime",
+  "Memes",
+  "Science",
+  "Activism",
+] as const;
+
 function Auth() {
   const nav = useNavigate();
   const { session, loading } = useAuth();
@@ -20,10 +39,14 @@ function Auth() {
   const [username, setUsername] = useState("");
   const [age, setAge] = useState("");
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState<"form" | "topics">("form");
+  const [topics, setTopics] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!loading && session) nav({ to: "/home", replace: true });
-  }, [loading, session, nav]);
+    if (!loading && session && step === "form" && mode === "signin") {
+      nav({ to: "/home", replace: true });
+    }
+  }, [loading, session, nav, step, mode]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,13 +72,39 @@ function Auth() {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to Links 💜");
+        toast.success("Account created — now pick your vibe ✨");
+        setStep("topics");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function toggleTopic(t: string) {
+    setTopics((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
+  }
+
+  async function saveTopicsAndExplore() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const userId = session?.user.id;
+      if (userId && topics.length > 0) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ topics })
+          .eq("id", userId);
+        if (error) throw error;
+      }
+      nav({ to: "/discover", replace: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not save topics";
       toast.error(msg);
     } finally {
       setBusy(false);
@@ -90,6 +139,60 @@ function Auth() {
           className="rounded-3xl border border-border p-6 backdrop-blur"
           style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
         >
+          {step === "topics" ? (
+            <div>
+              <h1 className="text-2xl font-black">Pick your vibe</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Choose topics you love — we'll tune your feed and people you meet.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {TOPIC_OPTIONS.map((t) => {
+                  const active = topics.includes(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleTopic(t)}
+                      className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${
+                        active
+                          ? "border-transparent text-primary-foreground"
+                          : "border-border bg-background/40 text-foreground hover:bg-background/70"
+                      }`}
+                      style={active ? { background: "var(--gradient-primary)" } : undefined}
+                    >
+                      {active && <Check className="h-3.5 w-3.5" />}
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {topics.length === 0 ? "Pick at least one to personalize Links." : `${topics.length} selected`}
+              </p>
+              <button
+                type="button"
+                onClick={saveTopicsAndExplore}
+                disabled={busy || topics.length === 0}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02] disabled:opacity-60"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
+                  Start exploring
+                  <ArrowRight className="h-4 w-4" />
+                </>}
+              </button>
+              <button
+                type="button"
+                onClick={() => nav({ to: "/discover", replace: true })}
+                disabled={busy}
+                className="mt-2 w-full rounded-full px-6 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+              >
+                Skip for now
+              </button>
+            </div>
+          ) : (
+          <>
           <div className="mb-6 flex rounded-full border border-border bg-background/40 p-1 text-sm" role="tablist" aria-label="Authentication mode">
             {(["signup", "signin"] as const).map((m) => (
               <button
@@ -153,6 +256,8 @@ function Auth() {
               </>}
             </button>
           </form>
+          </>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
