@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, Check, Loader2, Sparkles, Users, Star, BookOpen, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
+import { exploreTopics } from "@/lib/topic-explorer.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -41,6 +43,18 @@ function Auth() {
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState<"form" | "topics">("form");
   const [topics, setTopics] = useState<string[]>([]);
+  const [guides, setGuides] = useState<
+    Array<{
+      topic: string;
+      intro: string;
+      groups: { name: string; vibe: string }[];
+      people: { name: string; why: string }[];
+      history: string;
+      facts: string[];
+    }>
+  >([]);
+  const [exploring, setExploring] = useState(false);
+  const explore = useServerFn(exploreTopics);
 
   useEffect(() => {
     if (!loading && session && step === "form" && mode === "signin") {
@@ -72,6 +86,16 @@ function Auth() {
           },
         });
         if (error) throw error;
+        // Ensure a session exists so the app shell doesn't bounce us back to /auth.
+        const { data: sess } = await supabase.auth.getSession();
+        if (!sess.session) {
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInErr) {
+            toast.error("Check your email to confirm, then sign in.");
+            setMode("signin");
+            return;
+          }
+        }
         toast.success("Account created — now pick your vibe ✨");
         setStep("topics");
       } else {
@@ -88,6 +112,23 @@ function Auth() {
 
   function toggleTopic(t: string) {
     setTopics((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
+    // invalidate guides when selection changes
+    setGuides([]);
+  }
+
+  async function runExplore() {
+    if (exploring || topics.length === 0) return;
+    setExploring(true);
+    try {
+      const limited = topics.slice(0, 6);
+      const res = await explore({ data: { topics: limited } });
+      setGuides(res.topics || []);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not load topic info";
+      toast.error(msg);
+    } finally {
+      setExploring(false);
+    }
   }
 
   async function saveTopicsAndExplore() {
@@ -95,7 +136,11 @@ function Auth() {
     setBusy(true);
     try {
       const userId = session?.user.id;
-      if (userId && topics.length > 0) {
+      if (!userId) {
+        toast.error("Session not ready yet — give it a sec and try again.");
+        return;
+      }
+      if (topics.length > 0) {
         const { error } = await supabase
           .from("profiles")
           .update({ topics })
