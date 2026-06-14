@@ -217,6 +217,91 @@ function Auth() {
               </p>
               <button
                 type="button"
+                onClick={runExplore}
+                disabled={exploring || topics.length === 0}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background/40 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-background/70 disabled:opacity-50"
+              >
+                {exploring ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {exploring ? "Link OS is gathering the good stuff…" : guides.length ? "Refresh insights" : "Show me what's inside"}
+              </button>
+
+              {guides.length > 0 && (
+                <div className="mt-5 space-y-4">
+                  {guides.map((g) => (
+                    <article
+                      key={g.topic}
+                      className="rounded-2xl border border-border bg-background/40 p-4"
+                    >
+                      <header className="flex items-center gap-2">
+                        <span
+                          className="rounded-full px-3 py-0.5 text-xs font-bold text-primary-foreground"
+                          style={{ background: "var(--gradient-primary)" }}
+                        >
+                          {g.topic}
+                        </span>
+                      </header>
+                      <p className="mt-2 text-sm text-foreground">{g.intro}</p>
+
+                      {g.groups?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Users className="h-3 w-3" /> Groups to try
+                          </h3>
+                          <ul className="mt-1 space-y-1 text-xs">
+                            {g.groups.map((x, i) => (
+                              <li key={i}>
+                                <span className="font-semibold text-foreground">{x.name}</span>
+                                <span className="text-muted-foreground"> — {x.vibe}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                      {g.people?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Star className="h-3 w-3" /> People to know
+                          </h3>
+                          <ul className="mt-1 space-y-1 text-xs">
+                            {g.people.map((x, i) => (
+                              <li key={i}>
+                                <span className="font-semibold text-foreground">{x.name}</span>
+                                <span className="text-muted-foreground"> — {x.why}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                      {g.history && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <BookOpen className="h-3 w-3" /> History
+                          </h3>
+                          <p className="mt-1 text-xs text-muted-foreground">{g.history}</p>
+                        </section>
+                      )}
+
+                      {g.facts?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Lightbulb className="h-3 w-3" /> Did you know
+                          </h3>
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+                            {g.facts.map((f, i) => (
+                              <li key={i}>{f}</li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
                 onClick={saveTopicsAndExplore}
                 disabled={busy || topics.length === 0}
                 className="mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02] disabled:opacity-60"
