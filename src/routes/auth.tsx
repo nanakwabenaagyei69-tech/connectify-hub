@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, Check, Loader2, Sparkles, Users, Star, BookOpen, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
+import { exploreTopics } from "@/lib/topic-explorer.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -41,6 +43,18 @@ function Auth() {
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState<"form" | "topics">("form");
   const [topics, setTopics] = useState<string[]>([]);
+  const [guides, setGuides] = useState<
+    Array<{
+      topic: string;
+      intro: string;
+      groups: { name: string; vibe: string }[];
+      people: { name: string; why: string }[];
+      history: string;
+      facts: string[];
+    }>
+  >([]);
+  const [exploring, setExploring] = useState(false);
+  const explore = useServerFn(exploreTopics);
 
   useEffect(() => {
     if (!loading && session && step === "form" && mode === "signin") {
@@ -72,6 +86,16 @@ function Auth() {
           },
         });
         if (error) throw error;
+        // Ensure a session exists so the app shell doesn't bounce us back to /auth.
+        const { data: sess } = await supabase.auth.getSession();
+        if (!sess.session) {
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInErr) {
+            toast.error("Check your email to confirm, then sign in.");
+            setMode("signin");
+            return;
+          }
+        }
         toast.success("Account created — now pick your vibe ✨");
         setStep("topics");
       } else {
@@ -88,6 +112,23 @@ function Auth() {
 
   function toggleTopic(t: string) {
     setTopics((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
+    // invalidate guides when selection changes
+    setGuides([]);
+  }
+
+  async function runExplore() {
+    if (exploring || topics.length === 0) return;
+    setExploring(true);
+    try {
+      const limited = topics.slice(0, 6);
+      const res = await explore({ data: { topics: limited } });
+      setGuides(res.topics || []);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not load topic info";
+      toast.error(msg);
+    } finally {
+      setExploring(false);
+    }
   }
 
   async function saveTopicsAndExplore() {
@@ -95,7 +136,11 @@ function Auth() {
     setBusy(true);
     try {
       const userId = session?.user.id;
-      if (userId && topics.length > 0) {
+      if (!userId) {
+        toast.error("Session not ready yet — give it a sec and try again.");
+        return;
+      }
+      if (topics.length > 0) {
         const { error } = await supabase
           .from("profiles")
           .update({ topics })
@@ -170,6 +215,91 @@ function Auth() {
               <p className="mt-3 text-xs text-muted-foreground">
                 {topics.length === 0 ? "Pick at least one to personalize Links." : `${topics.length} selected`}
               </p>
+              <button
+                type="button"
+                onClick={runExplore}
+                disabled={exploring || topics.length === 0}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background/40 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-background/70 disabled:opacity-50"
+              >
+                {exploring ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {exploring ? "Link OS is gathering the good stuff…" : guides.length ? "Refresh insights" : "Show me what's inside"}
+              </button>
+
+              {guides.length > 0 && (
+                <div className="mt-5 space-y-4">
+                  {guides.map((g) => (
+                    <article
+                      key={g.topic}
+                      className="rounded-2xl border border-border bg-background/40 p-4"
+                    >
+                      <header className="flex items-center gap-2">
+                        <span
+                          className="rounded-full px-3 py-0.5 text-xs font-bold text-primary-foreground"
+                          style={{ background: "var(--gradient-primary)" }}
+                        >
+                          {g.topic}
+                        </span>
+                      </header>
+                      <p className="mt-2 text-sm text-foreground">{g.intro}</p>
+
+                      {g.groups?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Users className="h-3 w-3" /> Groups to try
+                          </h3>
+                          <ul className="mt-1 space-y-1 text-xs">
+                            {g.groups.map((x, i) => (
+                              <li key={i}>
+                                <span className="font-semibold text-foreground">{x.name}</span>
+                                <span className="text-muted-foreground"> — {x.vibe}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                      {g.people?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Star className="h-3 w-3" /> People to know
+                          </h3>
+                          <ul className="mt-1 space-y-1 text-xs">
+                            {g.people.map((x, i) => (
+                              <li key={i}>
+                                <span className="font-semibold text-foreground">{x.name}</span>
+                                <span className="text-muted-foreground"> — {x.why}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                      {g.history && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <BookOpen className="h-3 w-3" /> History
+                          </h3>
+                          <p className="mt-1 text-xs text-muted-foreground">{g.history}</p>
+                        </section>
+                      )}
+
+                      {g.facts?.length > 0 && (
+                        <section className="mt-3">
+                          <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <Lightbulb className="h-3 w-3" /> Did you know
+                          </h3>
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+                            {g.facts.map((f, i) => (
+                              <li key={i}>{f}</li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={saveTopicsAndExplore}
