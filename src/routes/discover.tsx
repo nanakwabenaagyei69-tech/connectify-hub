@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppNav";
-import { Search, Users, Plus, Loader2 } from "lucide-react";
+import { Search, Users, Plus, Loader2, Hash, X } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, initials } from "@/hooks/use-auth";
@@ -14,26 +14,73 @@ export const Route = createFileRoute("/discover")({
 type Person = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 type Group = { id: string; name: string; topic: string | null; member_count: number; is_member: boolean };
 
+const SUGGESTED_TOPICS = [
+  "Music", "Gaming", "Art", "Science", "Sports", "Climate",
+  "Coding", "Movies", "Books", "Travel", "Food", "Fashion",
+  "Photography", "Fitness", "History", "Anime", "Memes",
+];
+
 function Discover() {
   const { user } = useAuth();
   const nav = useNavigate();
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [people, setPeople] = useState<Person[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [topicHits, setTopicHits] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newTopic, setNewTopic] = useState("General");
 
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim()), 220);
+    return () => clearTimeout(t);
+  }, [q]);
+
   const load = useCallback(async () => {
     if (!user) return;
     setLoading(true);
+    const term = debouncedQ;
+    const like = `%${term.replace(/[%_]/g, "")}%`;
+
+    let profileQuery = supabase
+      .from("profiles")
+      .select("id, username, display_name, avatar_url, topics")
+      .neq("id", user.id)
+      .limit(50);
+    let roomQuery = supabase
+      .from("chat_rooms")
+      .select("id, name, topic")
+      .eq("is_group", true)
+      .limit(50);
+
+    if (term) {
+      profileQuery = profileQuery.or(
+        `username.ilike.${like},display_name.ilike.${like},bio.ilike.${like},topics.cs.{${term}}`,
+      );
+      roomQuery = roomQuery.or(`name.ilike.${like},topic.ilike.${like}`);
+    }
+
     const [{ data: profs }, { data: rooms }, { data: memberships }] = await Promise.all([
-      supabase.from("profiles").select("id, username, display_name, avatar_url").neq("id", user.id).limit(50),
-      supabase.from("chat_rooms").select("id, name, topic").eq("is_group", true).limit(50),
+      profileQuery,
+      roomQuery,
       supabase.from("room_members").select("room_id").eq("user_id", user.id),
     ]);
     setPeople((profs ?? []) as Person[]);
+
+    // Build a topic suggestion set from people + groups + curated list
+    const topicSet = new Set<string>();
+    (profs ?? []).forEach((p: any) => (p.topics ?? []).forEach((t: string) => t && topicSet.add(t)));
+    (rooms ?? []).forEach((r: any) => r.topic && topicSet.add(r.topic));
+    if (!term) SUGGESTED_TOPICS.forEach((t) => topicSet.add(t));
+    const hits = Array.from(topicSet);
+    setTopicHits(
+      term
+        ? hits.filter((t) => t.toLowerCase().includes(term.toLowerCase())).slice(0, 24)
+        : hits.slice(0, 16),
+    );
+
     const myRooms = new Set((memberships ?? []).map((m: any) => m.room_id));
     const roomIds = (rooms ?? []).map((r) => r.id);
     let counts = new Map<string, number>();
@@ -51,7 +98,7 @@ function Discover() {
       })),
     );
     setLoading(false);
-  }, [user]);
+  }, [user, debouncedQ]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -114,13 +161,12 @@ function Discover() {
     nav({ to: "/chats/$roomId", params: { roomId: room.id } });
   }
 
-  const filt = q.toLowerCase();
-  const peopleF = people.filter((p) => (p.username + (p.display_name ?? "")).toLowerCase().includes(filt));
-  const groupsF = groups.filter((g) => (g.name + (g.topic ?? "")).toLowerCase().includes(filt));
+  const peopleF = people;
+  const groupsF = groups;
 
   return (
     <AppShell title="Discover">
-      <div className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
         <Search className="h-4 w-4 text-muted-foreground" />
         <input
           value={q}
@@ -128,7 +174,31 @@ function Discover() {
           placeholder="Search people, groups, topics…"
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
+        {q && (
+          <button onClick={() => setQ("")} className="press text-muted-foreground hover:text-foreground" aria-label="Clear search">
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
+
+      {topicHits.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            {debouncedQ ? "Matching topics" : "Explore topics"}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {topicHits.map((t) => (
+              <button
+                key={t}
+                onClick={() => setQ(t)}
+                className="press flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary-glow"
+              >
+                <Hash className="h-3 w-3" /> {t}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Groups</h2>
