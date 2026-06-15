@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MessageCircle, Users, Globe2, Sparkles } from "lucide-react";
 import { useKeyboardAction } from "@/hooks/use-keyboard-action";
+import logoAsset from "@/assets/links-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,9 +61,9 @@ function Landing() {
       <div className="pointer-events-none absolute right-0 top-1/2 h-80 w-80 rounded-full bg-accent/30 blur-[120px]" />
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <div className="text-2xl font-black tracking-tight">
-          <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">Links</span>
-        </div>
+        <Link to="/" className="flex items-center gap-2 focus-visible:rounded-lg" aria-label="Links home">
+          <img src={logoAsset.url} alt="Links — United we stand" className="h-10 w-auto" />
+        </Link>
         <nav className="flex items-center gap-3">
           <Link to="/auth" className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:text-foreground focus-visible:rounded-full">
             Sign in
@@ -82,12 +83,13 @@ function Landing() {
           <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
           For everyone 14 and up
         </div>
+        <div className="mx-auto mb-8 flex justify-center">
+          <img src={logoAsset.url} alt="Links logo" className="h-24 w-auto md:h-32" />
+        </div>
         <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
           United we
           <br />
-          <span className="bg-gradient-to-r from-primary-glow via-accent to-primary bg-clip-text text-transparent">
-            stand.
-          </span>
+          <span className="text-foreground">stand.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
           Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
