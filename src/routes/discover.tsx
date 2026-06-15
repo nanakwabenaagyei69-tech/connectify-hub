@@ -161,6 +161,31 @@ function Discover() {
     nav({ to: "/chats/$roomId", params: { roomId: room.id } });
   }
 
+  async function joinTopic(topic: string) {
+    if (!user) return;
+    // Try to find an existing group for this topic (case-insensitive)
+    const { data: existing } = await supabase
+      .from("chat_rooms")
+      .select("id, name")
+      .eq("is_group", true)
+      .ilike("topic", topic)
+      .limit(1);
+    let roomId = existing?.[0]?.id;
+    if (!roomId) {
+      const { data: room, error } = await supabase
+        .from("chat_rooms")
+        .insert({ name: `${topic} Hub`, topic, is_group: true, created_by: user.id })
+        .select("id")
+        .single();
+      if (error || !room) { toast.error(error?.message ?? "Failed"); return; }
+      roomId = room.id;
+      toast.success(`Created ${topic} Hub`);
+    }
+    // Join (ignore duplicate-membership errors)
+    await supabase.from("room_members").insert({ room_id: roomId, user_id: user.id });
+    nav({ to: "/chats/$roomId", params: { roomId } });
+  }
+
   const peopleF = people;
   const groupsF = groups;
 
@@ -188,13 +213,22 @@ function Discover() {
           </h2>
           <div className="flex flex-wrap gap-2">
             {topicHits.map((t) => (
-              <button
-                key={t}
-                onClick={() => setQ(t)}
-                className="press flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary-glow"
-              >
-                <Hash className="h-3 w-3" /> {t}
-              </button>
+              <div key={t} className="flex items-center overflow-hidden rounded-full border border-border bg-card">
+                <button
+                  onClick={() => setQ(t)}
+                  className="press flex items-center gap-1 px-3 py-1 text-xs font-semibold text-primary-glow"
+                >
+                  <Hash className="h-3 w-3" /> {t}
+                </button>
+                <button
+                  onClick={() => joinTopic(t)}
+                  className="press border-l border-border px-2.5 py-1 text-xs font-semibold text-primary-foreground"
+                  style={{ background: "var(--gradient-primary)" }}
+                  aria-label={`Join ${t} group`}
+                >
+                  Join
+                </button>
+              </div>
             ))}
           </div>
         </div>
