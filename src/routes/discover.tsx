@@ -161,13 +161,12 @@ function Discover() {
     nav({ to: "/chats/$roomId", params: { roomId: room.id } });
   }
 
-  const filt = q.toLowerCase();
-  const peopleF = people.filter((p) => (p.username + (p.display_name ?? "")).toLowerCase().includes(filt));
-  const groupsF = groups.filter((g) => (g.name + (g.topic ?? "")).toLowerCase().includes(filt));
+  const peopleF = people;
+  const groupsF = groups;
 
   return (
     <AppShell title="Discover">
-      <div className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
         <Search className="h-4 w-4 text-muted-foreground" />
         <input
           value={q}
@@ -175,7 +174,31 @@ function Discover() {
           placeholder="Search people, groups, topics…"
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
+        {q && (
+          <button onClick={() => setQ("")} className="press text-muted-foreground hover:text-foreground" aria-label="Clear search">
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
+
+      {topicHits.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            {debouncedQ ? "Matching topics" : "Explore topics"}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {topicHits.map((t) => (
+              <button
+                key={t}
+                onClick={() => setQ(t)}
+                className="press flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary-glow"
+              >
+                <Hash className="h-3 w-3" /> {t}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Groups</h2>
