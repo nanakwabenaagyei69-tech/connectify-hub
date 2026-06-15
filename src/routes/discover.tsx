@@ -213,13 +213,22 @@ function Discover() {
           </h2>
           <div className="flex flex-wrap gap-2">
             {topicHits.map((t) => (
-              <button
-                key={t}
-                onClick={() => setQ(t)}
-                className="press flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary-glow"
-              >
-                <Hash className="h-3 w-3" /> {t}
-              </button>
+              <div key={t} className="flex items-center overflow-hidden rounded-full border border-border bg-card">
+                <button
+                  onClick={() => setQ(t)}
+                  className="press flex items-center gap-1 px-3 py-1 text-xs font-semibold text-primary-glow"
+                >
+                  <Hash className="h-3 w-3" /> {t}
+                </button>
+                <button
+                  onClick={() => joinTopic(t)}
+                  className="press border-l border-border px-2.5 py-1 text-xs font-semibold text-primary-foreground"
+                  style={{ background: "var(--gradient-primary)" }}
+                  aria-label={`Join ${t} group`}
+                >
+                  Join
+                </button>
+              </div>
             ))}
           </div>
         </div>
