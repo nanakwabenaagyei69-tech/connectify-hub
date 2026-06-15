@@ -4,6 +4,7 @@ import { useSwipeNavigation, hapticTap } from "@/hooks/use-swipe-nav";
 import { useCallback, useEffect, useRef } from "react";
 import { LinksOS } from "@/components/LinksOS";
 import { useAuth } from "@/hooks/use-auth";
+import logoAsset from "@/assets/links-logo.png.asset.json";
 
 const items = [
   { to: "/home", label: "Home", icon: Home },
@@ -93,9 +94,9 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
     <div className="min-h-screen bg-background pb-20">
       {title && (
         <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-            <Link to="/" className="text-lg font-black tracking-tight focus-visible:rounded-lg">
-              <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">Links</span>
+          <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
+            <Link to="/" className="flex items-center focus-visible:rounded-lg" aria-label="Links home">
+              <img src={logoAsset.url} alt="Links" className="h-8 w-auto" />
             </Link>
             <h1 className="text-sm font-semibold text-muted-foreground">{title}</h1>
           </div>
