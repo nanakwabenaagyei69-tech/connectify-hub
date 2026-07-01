@@ -20,7 +20,7 @@ export function LinksLogo({
     <span
       role="img"
       aria-label={alt}
-      className={`inline-block ${colorClassName} ${className}`}
+      className={`relative inline-block align-middle ${colorClassName} ${className}`}
       style={{
         backgroundColor: "currentColor",
         WebkitMaskImage: `url(${logoAsset.url})`,
@@ -31,9 +31,17 @@ export function LinksLogo({
         maskPosition: "center",
         WebkitMaskSize: "contain",
         maskSize: "contain",
-        aspectRatio: "auto",
       }}
-    />
+    >
+      {/* Invisible image preserves intrinsic aspect ratio so `w-auto` works. */}
+      <img
+        src={logoAsset.url}
+        alt=""
+        aria-hidden="true"
+        className="h-full w-auto opacity-0 pointer-events-none block"
+        draggable={false}
+      />
+    </span>
   );
 }
 
