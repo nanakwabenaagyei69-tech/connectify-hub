@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MessageCircle, Users, Globe2, Sparkles } from "lucide-react";
 import { useKeyboardAction } from "@/hooks/use-keyboard-action";
-import logoAsset from "@/assets/links-logo.png.asset.json";
+import { LinksLogo } from "@/components/LinksLogo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,7 +62,7 @@ function Landing() {
 
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link to="/" className="flex items-center gap-2 focus-visible:rounded-lg" aria-label="Links home">
-          <img src={logoAsset.url} alt="Links — United we stand" className="h-10 w-auto" />
+          <LinksLogo className="h-10 w-auto" colorClassName="text-primary" alt="Links — United we stand" />
         </Link>
         <nav className="flex items-center gap-3">
           <Link to="/auth" className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:text-foreground focus-visible:rounded-full">
@@ -84,7 +84,7 @@ function Landing() {
           For everyone 14 and up
         </div>
         <div className="mx-auto mb-8 flex justify-center">
-          <img src={logoAsset.url} alt="Links logo" className="h-24 w-auto md:h-32" />
+          <LinksLogo className="h-24 w-auto md:h-32" colorClassName="text-primary" alt="Links logo" />
         </div>
         <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
           United we
