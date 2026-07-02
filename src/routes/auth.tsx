@@ -195,7 +195,30 @@ function Auth() {
           className="rounded-3xl border border-border p-6 backdrop-blur"
           style={{ background: "var(--gradient-card)", boxShadow: "var(--shadow-card)" }}
         >
-          {step === "topics" ? (
+          {step === "confirm" ? (
+            <div>
+              <h1 className="text-2xl font-black">Confirm your email</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We sent a confirmation link to <span className="font-semibold text-foreground">{email}</span>.
+                Open it on this device to finish creating your Links account — we'll take it from there.
+              </p>
+              <div className="mt-5 flex items-center gap-2 rounded-2xl border border-border bg-background/40 p-3 text-xs text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Waiting for confirmation…
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPendingSignup(false);
+                  setStep("form");
+                  setMode("signin");
+                }}
+                className="mt-4 w-full rounded-full px-6 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+              >
+                Already confirmed? Sign in
+              </button>
+            </div>
+          ) : step === "topics" ? (
             <div>
               <h1 className="text-2xl font-black">Pick your vibe</h1>
               <p className="mt-1 text-sm text-muted-foreground">
