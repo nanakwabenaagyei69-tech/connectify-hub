@@ -41,7 +41,8 @@ function Auth() {
   const [username, setUsername] = useState("");
   const [age, setAge] = useState("");
   const [busy, setBusy] = useState(false);
-  const [step, setStep] = useState<"form" | "topics">("form");
+  const [step, setStep] = useState<"form" | "confirm" | "topics">("form");
+  const [pendingSignup, setPendingSignup] = useState(false);
   const [topics, setTopics] = useState<string[]>([]);
   const [guides, setGuides] = useState<
     Array<{
@@ -57,10 +58,19 @@ function Auth() {
   const explore = useServerFn(exploreTopics);
 
   useEffect(() => {
-    if (!loading && session && step === "form" && mode === "signin") {
+    if (loading) return;
+    if (!session) return;
+    // Just signed up (with or without email confirm) → advance into topics.
+    if (pendingSignup) {
+      setPendingSignup(false);
+      setStep("topics");
+      return;
+    }
+    // Returning signed-in user landing on /auth → send them home.
+    if (step === "form" && mode === "signin") {
       nav({ to: "/home", replace: true });
     }
-  }, [loading, session, nav, step, mode]);
+  }, [loading, session, nav, step, mode, pendingSignup]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,7 +87,7 @@ function Auth() {
           toast.error("Username: 3–24 letters, numbers, or underscores.");
           return;
         }
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -86,21 +96,22 @@ function Auth() {
           },
         });
         if (error) throw error;
-        // Ensure a session exists so the app shell doesn't bounce us back to /auth.
-        const { data: sess } = await supabase.auth.getSession();
-        if (!sess.session) {
-          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-          if (signInErr) {
-            toast.error("Check your email to confirm, then sign in.");
-            setMode("signin");
-            return;
-          }
+        // Two possible outcomes:
+        // 1) Auto-confirm on → signUp returns a session immediately.
+        // 2) Email confirmation required → no session; user must click link in email.
+        if (signUpData.session) {
+          toast.success("Account created — now pick your vibe ✨");
+          setPendingSignup(true); // effect will advance to topics once session lands
+          setStep("topics");
+        } else {
+          setPendingSignup(true); // when they confirm & land back, effect advances
+          setStep("confirm");
+          toast.success("Check your email to confirm your account.");
         }
-        toast.success("Account created — now pick your vibe ✨");
-        setStep("topics");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // Effect will redirect to /home once session propagates.
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
