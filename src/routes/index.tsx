@@ -54,6 +54,75 @@ function FeatureCard({
 }
 
 function Landing() {
+  return LandingInner();
+}
+
+function LogoShowcase() {
+  return (
+    <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center">
+      {/* Ambient gradient halo */}
+      <div
+        className="absolute inset-6 rounded-[42%] blur-3xl opacity-70"
+        style={{ background: "var(--gradient-primary)" }}
+        aria-hidden="true"
+      />
+
+      {/* Concentric rotating rings */}
+      <div
+        className="absolute inset-0 rounded-full border border-primary/25 [mask-image:radial-gradient(circle,black_60%,transparent_75%)] animate-[spin_28s_linear_infinite]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-6 rounded-full border border-accent/40 [mask-image:radial-gradient(circle,black_55%,transparent_80%)] animate-[spin_44s_linear_infinite_reverse]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-12 rounded-full border border-dashed border-primary-glow/50"
+        aria-hidden="true"
+      />
+
+      {/* Orbiting satellite chips */}
+      {[
+        { label: "chat", top: "6%", left: "50%" },
+        { label: "groups", top: "50%", left: "94%" },
+        { label: "events", top: "94%", left: "50%" },
+        { label: "topics", top: "50%", left: "6%" },
+      ].map((chip) => (
+        <span
+          key={chip.label}
+          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-card/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground shadow-[var(--shadow-card)] backdrop-blur"
+          style={{ top: chip.top, left: chip.left }}
+        >
+          {chip.label}
+        </span>
+      ))}
+
+      {/* Central logo tile */}
+      <div
+        className="relative flex aspect-square w-[62%] items-center justify-center rounded-[32%] p-8"
+        style={{
+          background: "var(--gradient-card)",
+          boxShadow: "var(--shadow-glow), var(--shadow-card)",
+          border: "1px solid color-mix(in oklab, var(--primary) 25%, transparent)",
+        }}
+      >
+        <LinksLogo
+          variant="mark"
+          className="h-full w-full"
+          colorClassName="text-primary"
+          alt="Links emblem"
+        />
+      </div>
+
+      {/* Motto ribbon */}
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-background/80 px-4 py-1.5 text-[11px] font-semibold tracking-widest text-primary-glow shadow-[var(--shadow-card)] backdrop-blur">
+        UNITED · WE · STAND
+      </div>
+    </div>
+  );
+}
+
+function LandingInner() {
   return (
     <div className="min-h-screen overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
       {/* Glow orbs */}
