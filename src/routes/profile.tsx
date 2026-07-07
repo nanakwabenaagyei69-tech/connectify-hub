@@ -19,6 +19,7 @@ function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
+  const [age, setAge] = useState<string>("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ function Profile() {
       setDisplayName(profile.display_name ?? "");
       setBio(profile.bio ?? "");
       setTopics(profile.topics ?? []);
+      setAge(profile.age != null ? String(profile.age) : "");
     }
   }, [profile]);
 
@@ -33,9 +35,15 @@ function Profile() {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
+    const parsedAge = age.trim() === "" ? null : Number(age);
+    if (parsedAge !== null && (!Number.isInteger(parsedAge) || parsedAge < 13 || parsedAge > 120)) {
+      setSaving(false);
+      toast.error("Age must be a whole number between 13 and 120");
+      return;
+    }
     const { error } = await supabase
       .from("profiles")
-      .update({ display_name: displayName.trim() || null, bio: bio.trim() || null, topics })
+      .update({ display_name: displayName.trim() || null, bio: bio.trim() || null, topics, age: parsedAge })
       .eq("id", user.id);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
@@ -70,6 +78,16 @@ function Profile() {
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bio</label>
           <textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={300} rows={3} className="mt-1 w-full resize-none rounded-2xl border border-border bg-input px-4 py-3 text-sm outline-none focus:border-primary" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Age</label>
+          <input
+            value={age}
+            onChange={(e) => setAge(e.target.value.replace(/[^0-9]/g, "").slice(0, 3))}
+            inputMode="numeric"
+            placeholder="14"
+            className="mt-1 w-full rounded-2xl border border-border bg-input px-4 py-3 text-sm outline-none focus:border-primary"
+          />
         </div>
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Topics you care about</label>
