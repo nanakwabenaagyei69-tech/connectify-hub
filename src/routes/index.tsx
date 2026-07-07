@@ -54,6 +54,75 @@ function FeatureCard({
 }
 
 function Landing() {
+  return LandingInner();
+}
+
+function LogoShowcase() {
+  return (
+    <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center">
+      {/* Ambient gradient halo */}
+      <div
+        className="absolute inset-6 rounded-[42%] blur-3xl opacity-70"
+        style={{ background: "var(--gradient-primary)" }}
+        aria-hidden="true"
+      />
+
+      {/* Concentric rotating rings */}
+      <div
+        className="absolute inset-0 rounded-full border border-primary/25 [mask-image:radial-gradient(circle,black_60%,transparent_75%)] animate-[spin_28s_linear_infinite]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-6 rounded-full border border-accent/40 [mask-image:radial-gradient(circle,black_55%,transparent_80%)] animate-[spin_44s_linear_infinite_reverse]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-12 rounded-full border border-dashed border-primary-glow/50"
+        aria-hidden="true"
+      />
+
+      {/* Orbiting satellite chips */}
+      {[
+        { label: "chat", top: "6%", left: "50%" },
+        { label: "groups", top: "50%", left: "94%" },
+        { label: "events", top: "94%", left: "50%" },
+        { label: "topics", top: "50%", left: "6%" },
+      ].map((chip) => (
+        <span
+          key={chip.label}
+          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-card/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground shadow-[var(--shadow-card)] backdrop-blur"
+          style={{ top: chip.top, left: chip.left }}
+        >
+          {chip.label}
+        </span>
+      ))}
+
+      {/* Central logo tile */}
+      <div
+        className="relative flex aspect-square w-[62%] items-center justify-center rounded-[32%] p-8"
+        style={{
+          background: "var(--gradient-card)",
+          boxShadow: "var(--shadow-glow), var(--shadow-card)",
+          border: "1px solid color-mix(in oklab, var(--primary) 25%, transparent)",
+        }}
+      >
+        <LinksLogo
+          variant="mark"
+          className="h-full w-full"
+          colorClassName="text-primary"
+          alt="Links emblem"
+        />
+      </div>
+
+      {/* Motto ribbon */}
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-background/80 px-4 py-1.5 text-[11px] font-semibold tracking-widest text-primary-glow shadow-[var(--shadow-card)] backdrop-blur">
+        UNITED · WE · STAND
+      </div>
+    </div>
+  );
+}
+
+function LandingInner() {
   return (
     <div className="min-h-screen overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
       {/* Glow orbs */}
@@ -78,38 +147,41 @@ function Landing() {
         </nav>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pt-16 pb-24 text-center">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
-          <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
-          For everyone 14 and up
+      <section className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 pt-12 pb-24 md:grid-cols-2 md:pt-20">
+        {/* Left: copy */}
+        <div className="text-center md:text-left">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
+            <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
+            For everyone 14 and up
+          </div>
+          <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
+            United we
+            <br />
+            <span className="text-foreground">stand.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:mx-0 mx-auto">
+            Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+            <Link
+              to="/home"
+              className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              Enter the app
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+            <Link
+              to="/discover"
+              className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card focus-visible:rounded-full"
+            >
+              Explore topics
+            </Link>
+          </div>
         </div>
-        <div className="mx-auto mb-8 flex justify-center">
-          <LinksLogo className="h-24 w-auto md:h-32" colorClassName="text-primary" alt="Links logo" />
-        </div>
-        <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
-          United we
-          <br />
-          <span className="text-foreground">stand.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-          Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/home"
-            className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            Enter the app
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-          </Link>
-          <Link
-            to="/discover"
-            className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card focus-visible:rounded-full"
-          >
-            Explore topics
-          </Link>
-        </div>
+
+        {/* Right: logo showcase */}
+        <LogoShowcase />
       </section>
 
       <section className="relative z-10 mx-auto grid max-w-5xl gap-4 px-6 pb-24 md:grid-cols-3">
