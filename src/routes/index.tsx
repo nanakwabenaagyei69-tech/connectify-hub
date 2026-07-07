@@ -79,37 +79,41 @@ function Landing() {
       </header>
 
       <section className="relative z-10 mx-auto max-w-4xl px-6 pt-16 pb-24 text-center">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
-          <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
-          For everyone 14 and up
+      <section className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 pt-12 pb-24 md:grid-cols-2 md:pt-20">
+        {/* Left: copy */}
+        <div className="text-center md:text-left">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
+            <Sparkles className="h-3 w-3 text-primary-glow" aria-hidden="true" />
+            For everyone 14 and up
+          </div>
+          <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
+            United we
+            <br />
+            <span className="text-foreground">stand.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:mx-0 mx-auto">
+            Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+            <Link
+              to="/home"
+              className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              Enter the app
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+            <Link
+              to="/discover"
+              className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card focus-visible:rounded-full"
+            >
+              Explore topics
+            </Link>
+          </div>
         </div>
-        <div className="mx-auto mb-8 flex justify-center">
-          <LinksLogo className="h-24 w-auto md:h-32" colorClassName="text-primary" alt="Links logo" />
-        </div>
-        <h1 className="text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
-          United we
-          <br />
-          <span className="text-foreground">stand.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-          Find your people, your topics, your moments. Links blends group chat, communities, and global events into one place to actually connect.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/home"
-            className="press press-glow group inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 focus-visible:rounded-full"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            Enter the app
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-          </Link>
-          <Link
-            to="/discover"
-            className="press rounded-full border border-border bg-card/40 px-6 py-3 font-semibold text-foreground backdrop-blur hover:bg-card focus-visible:rounded-full"
-          >
-            Explore topics
-          </Link>
-        </div>
+
+        {/* Right: logo showcase */}
+        <LogoShowcase />
       </section>
 
       <section className="relative z-10 mx-auto grid max-w-5xl gap-4 px-6 pb-24 md:grid-cols-3">
