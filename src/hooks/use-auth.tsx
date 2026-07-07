@@ -9,6 +9,7 @@ export type Profile = {
   avatar_url: string | null;
   bio: string | null;
   topics: string[];
+  age: number | null;
 };
 
 export function useAuth() {
@@ -41,7 +42,7 @@ export function useAuth() {
     let cancelled = false;
     supabase
       .from("profiles")
-      .select("id, username, display_name, avatar_url, bio, topics")
+      .select("id, username, display_name, avatar_url, bio, topics, age")
       .eq("id", userId)
       .maybeSingle()
       .then(({ data }) => {
