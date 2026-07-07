@@ -78,7 +78,6 @@ function Landing() {
         </nav>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pt-16 pb-24 text-center">
       <section className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 pt-12 pb-24 md:grid-cols-2 md:pt-20">
         {/* Left: copy */}
         <div className="text-center md:text-left">
