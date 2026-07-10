@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, Loader2, Sparkles, Users, Star, BookOpen, Lightbulb } from "lucide-react";
+import { ArrowRight, Check, Loader2, Sparkles, Users, Star, BookOpen, Lightbulb, Ghost } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
@@ -176,6 +176,22 @@ function Auth() {
       if (res.error) {
         toast.error(res.error.message || "Google sign-in failed");
       }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function continueAsGuest() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInAnonymously();
+      if (error) throw error;
+      toast.success("You're in as a guest ✨");
+      setPendingSignup(true); // effect will advance to topics once session lands
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not start guest session";
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -391,6 +407,18 @@ function Auth() {
             <GoogleMark />
             Continue with Google
           </button>
+
+          {mode === "signup" && (
+            <button
+              type="button"
+              onClick={continueAsGuest}
+              disabled={busy}
+              className="mt-2 flex w-full items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-background/40 px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-background/70 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ghost className="h-4 w-4" />}
+              Continue as guest — no signup
+            </button>
+          )}
 
           <div className="my-4 flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-foreground">
             <div className="h-px flex-1 bg-border" />
