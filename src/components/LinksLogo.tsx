@@ -48,7 +48,7 @@ export function LinksLogo({
       <span
         role="img"
         aria-label={alt}
-        className={`inline-flex items-center justify-center align-middle aspect-square ${colorClassName} ${className}`}
+        className={`inline-flex items-center justify-center align-middle aspect-square transition-colors duration-500 ease-out ${colorClassName} ${className}`}
       >
         <LinksMark className="h-full w-full" />
       </span>
@@ -59,7 +59,7 @@ export function LinksLogo({
     <span
       role="img"
       aria-label={alt}
-      className={`inline-flex items-center align-middle gap-[0.35em] leading-none ${colorClassName} ${className}`}
+      className={`inline-flex items-center align-middle gap-[0.35em] leading-none transition-colors duration-500 ease-out ${colorClassName} ${className}`}
       style={{ fontFamily: "'Outfit', ui-sans-serif, system-ui, sans-serif" }}
     >
       <LinksMark className="h-full w-auto aspect-square shrink-0" />
