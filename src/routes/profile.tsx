@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, initials } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "You — Links" }] }),
@@ -16,6 +17,7 @@ const ALL_TOPICS = ["Science", "Music", "Gaming", "Sports", "Climate", "Art", "C
 function Profile() {
   const { user, profile, signOut } = useAuth();
   const nav = useNavigate();
+  const queryClient = useQueryClient();
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
