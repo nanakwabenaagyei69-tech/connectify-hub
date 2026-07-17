@@ -53,6 +53,8 @@ function Profile() {
   }
 
   async function logout() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await signOut();
     nav({ to: "/auth", replace: true });
   }
