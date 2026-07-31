@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, X, Send, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { askLinksOS } from "@/lib/links-os.functions";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
+  "Explain quantum entanglement simply",
+  "Help me with my math homework",
+  "Write a Python script to rename files",
+  "Give me study tips for exams",
   "Find a science group",
-  "Draft a post about my project",
-  "What events are tonight?",
   "Open my chats",
 ];
 
@@ -18,7 +22,7 @@ export function LinksOS() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "Hi — I'm **Link OS**. I can find groups, draft posts, summarize chats, or just take you where you want to go." },
+    { role: "assistant", content: "Hi — I'm **Link OS**. Ask me anything: homework, code, science, advice, writing — or let me find groups, draft posts and take you around the app." },
   ]);
   const ask = useServerFn(askLinksOS);
   const navigate = useNavigate();
@@ -115,9 +119,15 @@ export function LinksOS() {
                   }
                   style={m.role === "user" ? { background: "var(--gradient-primary)" } : undefined}
                 >
-                  {m.content.split("\n").map((line, j) => (
-                    <p key={j} className={j > 0 ? "mt-1" : ""}>{line}</p>
-                  ))}
+                  {m.role === "user" ? (
+                    m.content.split("\n").map((line, j) => (
+                      <p key={j} className={j > 0 ? "mt-1" : ""}>{line}</p>
+                    ))
+                  ) : (
+                    <div className="space-y-2 [&_a]:underline [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[12px] [&_h1]:text-base [&_h1]:font-bold [&_h2]:text-sm [&_h2]:font-bold [&_h3]:text-sm [&_h3]:font-semibold [&_li]:ml-4 [&_li]:list-disc [&_ol_li]:list-decimal [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:border [&_pre]:border-border [&_pre]:bg-muted [&_pre]:p-3 [&_pre_code]:bg-transparent [&_strong]:font-semibold [&_table]:block [&_table]:overflow-x-auto [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-1">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
